@@ -12,13 +12,15 @@ let () = factorial 20 |> Printf.printf "%i\n"
 let fibonacci =
   let rec fibonacci' a b n =
     match n with
+    | 0 -> a
     | 1 -> b
-    | n -> fibonacci' b (a + b) (n - 1)
+    | n when n > 0 -> fibonacci' b (a + b) (n - 1)
+    | n -> fibonacci' (b - a) a (n + 1)
   in
   fibonacci' 0 1
 ;;
 
-let () = fibonacci 7 |> Printf.printf "%i\n"
+let () = fibonacci (-8) |> Printf.printf "%i\n"
 
 let filter =
   let rec filter' acc f l =

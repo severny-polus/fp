@@ -109,10 +109,22 @@ let rec eval e =
   | Op (l, op, r) -> (apply op) (eval l) (eval r)
 ;;
 
-let rec show e =
-  match e with
-  | Num n -> Printf.sprintf "%d" n
-  | Op (l, op, r) -> Printf.sprintf "%s %s %s" (show l) (show_op op) (show r)
+let show =
+  let rec show' need_parens e =
+    match e with
+    | Num n -> Printf.sprintf "%d" n
+    | Op (l, op, r) ->
+      (match op with
+       | Plus | Minus ->
+         Printf.sprintf
+           (if need_parens then "(%s %s %s)" else "%s %s %s")
+           (show' false l)
+           (show_op op)
+           (show' false r)
+       | Times | Slash ->
+         Printf.sprintf "%s %s %s" (show' true l) (show_op op) (show' true r))
+  in
+  show' false
 ;;
 
 let () =
