@@ -1,0 +1,14 @@
+(executable
+ (public_name tree)
+ (name tree)
+ (libraries fp))
+
+(executable
+ (public_name calc)
+ (name calc)
+ (libraries fp))
+
+(executable
+ (public_name tail)
+ (name tail)
+ (libraries fp))
