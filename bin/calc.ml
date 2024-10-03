@@ -110,25 +110,29 @@ let rec eval e =
 ;;
 
 let show =
-  let rec show' need_parens e =
+  let rec show' need_parens is_right e =
     match e with
     | Num n -> Printf.sprintf "%d" n
     | Op (l, op, r) ->
       (match op with
        | Plus | Minus ->
          Printf.sprintf
-           (if need_parens then "(%s %s %s)" else "%s %s %s")
-           (show' false l)
+           (if need_parens || is_right then "(%s %s %s)" else "%s %s %s")
+           (show' false false l)
            (show_op op)
-           (show' false r)
+           (show' false true r)
        | Times | Slash ->
-         Printf.sprintf "%s %s %s" (show' true l) (show_op op) (show' true r))
+         Printf.sprintf
+           (if is_right then "(%s %s %s)" else "%s %s %s")
+           (show' true false l)
+           (show_op op)
+           (show' true true r))
   in
-  show' false
+  show' false false
 ;;
 
 let () =
   let e = In_channel.stdin |> input_line |> parse in
-  assert (parse (show e) = e);
-  e |> eval |> Printf.printf "%s = %i\n" (show e)
+  e |> eval |> Printf.printf "%s = %i\n" (show e);
+  assert (parse (show e) = e)
 ;;
