@@ -51,25 +51,47 @@ let rec exists criteria tree =
     criteria value || exists criteria less || exists criteria greater
 ;;
 
+let fold f acc tree =
+  let rec fold' f acc tree k =
+    match tree with
+    | Leaf -> k acc
+    | Node (_, value, less, greater) ->
+      fold' f acc less (fun acc -> fold' f (f acc value) greater k)
+  in
+  fold' f acc tree (fun acc -> acc)
+;;
+
+let all p tree =
+  let rec all' p tree k =
+    match tree with
+    | Leaf -> k true
+    | Node (_, value, less, greater) ->
+      p value && all' p less (fun result -> result && all' p greater k)
+  in
+  all' p tree (fun x -> x)
+;;
+
 let () =
   let insert = insert String.compare in
   let dump = dump (Printf.sprintf "%s") (Printf.sprintf "%d") in
   let nodes =
     Leaf
-    |> insert "kns" 4
-    |> insert "uek" 3
-    |> insert "udm" 1
+    |> insert "kns" 2
+    |> insert "uek" 2
+    |> insert "udm" 4
     |> insert "bkp" 2
-    |> insert "bvm" 5
+    |> insert "bvm" 2
     |> insert "sd" 6
   in
   nodes |> dump |> Printf.printf "%s\n";
   let find_result name =
     match nodes |> find String.compare name with
-    | Some index -> Printf.sprintf "%s has index %d" name index
-    | None -> Printf.sprintf "%s has no index" name
+    | Some index -> Printf.sprintf "%s has value %d" name index
+    | None -> Printf.sprintf "no %s was found" name
   in
-  find_result "udm" |> Printf.printf "%s\n";
+  find_result "bii" |> Printf.printf "%s\n";
   nodes |> map (( + ) 1) |> dump |> Printf.printf "%s\n";
-  nodes |> exists (function x -> x mod 7 == 0) |> Printf.printf "%B\n"
+  nodes |> exists (function x -> x mod 7 == 0) |> Printf.printf "%B\n";
+  nodes |> fold ( + ) 0 |> Printf.printf "%i\n";
+  nodes |> all (fun x -> x mod 2 == 0) |> Printf.printf "%B\n"
 ;;
